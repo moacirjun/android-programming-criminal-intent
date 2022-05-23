@@ -11,6 +11,7 @@ class CrimeListViewModel : ViewModel() {
             crimes += Crime().apply {
                 title = "Crime #$i"
                 isSolved = i % 2 == 0
+                requiresPolice = i % 5 == 0
             }
         }
     }

@@ -62,7 +62,7 @@ class CrimeListFragment : Fragment() {
         private lateinit var crime: Crime
 
         val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
-        val dateTextView: TextView = itemView.findViewById(R.id.crime_title)
+        val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
 
         init {
             itemView.setOnClickListener(this)
@@ -81,9 +81,16 @@ class CrimeListFragment : Fragment() {
     private inner class CrimeAdapter(val crimes: List<Crime>) : Adapter<CrimeHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
-            val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
+            val view = layoutInflater.inflate(viewType, parent, false)
             return CrimeHolder(view)
         }
+
+        override fun getItemViewType(position: Int): Int =
+            if (crimes[position].requiresPolice) {
+                R.layout.list_item_serious_crime
+            } else {
+                R.layout.list_item_crime
+            }
 
         override fun onBindViewHolder(holder: CrimeHolder, position: Int) {
             val crime = crimes[position]

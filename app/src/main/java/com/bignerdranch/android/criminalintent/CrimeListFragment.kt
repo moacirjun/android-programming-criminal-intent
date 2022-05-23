@@ -62,7 +62,7 @@ class CrimeListFragment : Fragment() {
         private lateinit var crime: Crime
 
         val titleTextView: TextView = itemView.findViewById(R.id.crime_title)
-        val dateTextView: TextView = itemView.findViewById(R.id.crime_title)
+        val dateTextView: TextView = itemView.findViewById(R.id.crime_date)
 
         init {
             itemView.setOnClickListener(this)

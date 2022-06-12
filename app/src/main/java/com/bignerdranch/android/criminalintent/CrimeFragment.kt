@@ -16,6 +16,7 @@ import java.util.*
 private const val ARG_CRIME_ID = "crime-id"
 private const val DIALOG_DATE = "DialogDate"
 private const val REQUEST_DATE = 0
+private const val REQUEST_KEY = "DATE_RESULT_KEY"
 
 class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 
@@ -93,8 +94,15 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         titleField.addTextChangedListener(titleWatcher)
 
         dateButton.setOnClickListener {
-            DatePickerFragment.newInstance(crime.date).apply {
-                setTargetFragment(this@CrimeFragment, REQUEST_DATE)
+            parentFragmentManager.setFragmentResultListener(
+                REQUEST_KEY,
+                viewLifecycleOwner
+            ) { _, bundle ->
+                crime.date = bundle.getSerializable(DatePickerFragment.SELECTED_DATE_KEY) as Date
+                updateUI()
+            }
+
+            DatePickerFragment.newInstance(crime.date, REQUEST_KEY).apply {
                 show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
             }
         }

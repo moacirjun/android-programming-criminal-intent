@@ -15,10 +15,9 @@ import java.util.*
 
 private const val ARG_CRIME_ID = "crime-id"
 private const val DIALOG_DATE = "DialogDate"
-private const val REQUEST_DATE = 0
 private const val REQUEST_KEY = "DATE_RESULT_KEY"
 
-class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment : Fragment() {
 
     private lateinit var crime: Crime
     private lateinit var titleField: EditText
@@ -94,16 +93,15 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         titleField.addTextChangedListener(titleWatcher)
 
         dateButton.setOnClickListener {
-            parentFragmentManager.setFragmentResultListener(
-                REQUEST_KEY,
-                viewLifecycleOwner
-            ) { _, bundle ->
-                crime.date = bundle.getSerializable(DatePickerFragment.SELECTED_DATE_KEY) as Date
-                updateUI()
-            }
+            parentFragmentManager.also {
+                it.setFragmentResultListener(REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+                    crime.date =
+                        bundle.getSerializable(DatePickerFragment.SELECTED_DATE_KEY) as Date
+                    updateUI()
+                }
 
-            DatePickerFragment.newInstance(crime.date, REQUEST_KEY).apply {
-                show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
+                DatePickerFragment.newInstance(crime.date, REQUEST_KEY)
+                    .show(it, DIALOG_DATE)
             }
         }
     }
@@ -120,10 +118,5 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
-    }
-
-    override fun onDateSelected(date: Date) {
-        crime.date = date
-        updateUI()
     }
 }

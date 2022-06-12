@@ -11,14 +11,10 @@ private const val ARG_REQUEST_KEY = "argument_result_key"
 
 class DatePickerFragment : DialogFragment() {
 
-    interface Callbacks {
-        fun onDateSelected(date: Date)
-    }
-
     companion object {
         const val SELECTED_DATE_KEY = "SELECTED_DATE"
 
-        fun newInstance(date: Date, requestKey: String? = null): DatePickerFragment =
+        fun newInstance(date: Date, requestKey: String): DatePickerFragment =
             DatePickerFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(ARG_DATE, date)
@@ -29,14 +25,17 @@ class DatePickerFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val listener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-            arguments?.getString(ARG_REQUEST_KEY)?.let { requestKey ->
-                val resultDate = GregorianCalendar(year, month, dayOfMonth).time
-                val result = Bundle().apply {
-                    putSerializable(SELECTED_DATE_KEY, resultDate)
-                }
-
-                parentFragmentManager.setFragmentResult(requestKey, result)
+            val requestKey = requireArguments().getString(ARG_REQUEST_KEY)!!
+            val resultDate = GregorianCalendar.getInstance().apply {
+                set(GregorianCalendar.YEAR, year)
+                set(GregorianCalendar.MONTH, month)
+                set(GregorianCalendar.DAY_OF_MONTH, dayOfMonth)
             }
+            val result = Bundle().apply {
+                putSerializable(SELECTED_DATE_KEY, resultDate.time)
+            }
+
+            parentFragmentManager.setFragmentResult(requestKey, result)
         }
 
         val date = arguments?.getSerializable(ARG_DATE) as Date

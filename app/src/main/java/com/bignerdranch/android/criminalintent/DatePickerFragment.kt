@@ -11,10 +11,6 @@ private const val ARG_REQUEST_KEY = "argument_result_key"
 
 class DatePickerFragment : DialogFragment() {
 
-    interface Callbacks {
-        fun onDateSelected(date: Date)
-    }
-
     companion object {
         const val SELECTED_DATE_KEY = "SELECTED_DATE"
 
@@ -30,9 +26,13 @@ class DatePickerFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val listener = DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
             arguments?.getString(ARG_REQUEST_KEY)?.let { requestKey ->
-                val resultDate = GregorianCalendar(year, month, dayOfMonth).time
+                val gregorianCalendar = GregorianCalendar.getInstance().apply {
+                    set(GregorianCalendar.YEAR, year)
+                    set(GregorianCalendar.MONTH, month)
+                    set(GregorianCalendar.DAY_OF_MONTH, dayOfMonth)
+                }
                 val result = Bundle().apply {
-                    putSerializable(SELECTED_DATE_KEY, resultDate)
+                    putSerializable(SELECTED_DATE_KEY, gregorianCalendar.time)
                 }
 
                 parentFragmentManager.setFragmentResult(requestKey, result)

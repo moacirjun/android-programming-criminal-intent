@@ -3,6 +3,7 @@ package com.bignerdranch.android.criminalintent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +16,15 @@ import java.util.*
 
 private const val ARG_CRIME_ID = "crime-id"
 private const val DIALOG_DATE = "DialogDate"
-private const val REQUEST_DATE = 0
+private const val DIALOG_TIME = "DialogTime"
 private const val REQUEST_KEY = "DATE_RESULT_KEY"
 
-class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment : Fragment() {
 
     private lateinit var crime: Crime
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
+    private lateinit var timeButton: Button
     private lateinit var solvedCheckBox: CheckBox
 
     private val crimeDetailsViewModel: CrimeDetailsViewModel by lazy {
@@ -56,6 +58,7 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
             .also { view ->
                 titleField = view.findViewById(R.id.crime_title) as EditText
                 dateButton = view.findViewById(R.id.crime_date) as Button
+                timeButton = view.findViewById(R.id.crime_time) as Button
                 solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
                 solvedCheckBox.setOnCheckedChangeListener { _, isChecked ->
                     crime.isSolved = isChecked
@@ -106,6 +109,19 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
                 show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
             }
         }
+
+        timeButton.setOnClickListener {
+            parentFragmentManager.setFragmentResultListener(
+                REQUEST_KEY,
+                viewLifecycleOwner
+            ) { _, bundle ->
+                crime.date = bundle.getSerializable(TimePickerFragment.RESULT_DATE_KEY) as Date
+                updateUI()
+            }
+
+            TimePickerFragment.newInstance(crime.date, REQUEST_KEY)
+                .show(this@CrimeFragment.parentFragmentManager, DIALOG_TIME)
+        }
     }
 
     override fun onStop() {
@@ -115,15 +131,11 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 
     private fun updateUI() {
         titleField.setText(crime.title)
-        dateButton.text = crime.date.toString()
+        dateButton.text = DateFormat.format("EEEE, MMM dd, yyyy'.", crime.date)
+        timeButton.text = DateFormat.format("HH:mm", crime.date)
         solvedCheckBox.apply {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
-    }
-
-    override fun onDateSelected(date: Date) {
-        crime.date = date
-        updateUI()
     }
 }
